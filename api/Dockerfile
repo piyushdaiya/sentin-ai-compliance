@@ -5,11 +5,13 @@ WORKDIR /app
 # 1. Copy go.mod first
 COPY go.mod ./
 
-# 2. Copy the source code (CRITICAL FIX: This was missing before the tidy step)
+# 2. CRITICAL: Copy source code BEFORE downloading dependencies
+# This ensures 'go mod tidy' can see the imports in main.go
 COPY *.go ./
 
-# 3. Now run tidy. It will scan main.go, find the missing libs, and download them.
+# 3. Resolve dependencies
 RUN go mod tidy
+RUN go mod download
 
 # 4. Build
 RUN go build -o /sentinel-engine
